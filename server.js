@@ -1,5 +1,5 @@
 import express from "express"
-import mysql from "mysql2"
+import mysql from "mysql2/promise"
 import cors from "cors"
 
 const app = express()
@@ -8,20 +8,22 @@ app.use(cors({origin:"*"}))
 
 const config = {
   host: "127.0.0.1",
-  username:"root",
+  user:"root",
   password:"clinT",
   database:"restaurant",
 }
 
+const pool = mysql.createPool(config)
 
 const port = 8000
 
-app.get('/products',async (req,res)=>{
-  let query = "select * from products";
+app.get('/food',async (req,res)=>{
+  console.log("test")
+  let query = "select * from food";
   try{
-    let connection = await mysql.createConnection(config)
-    let [result] = await connection.execute(query)
-    await connection.end()
+    const result = await pool.execute(query)
+    
+    console.log(result)
     return res.json(result)
   }catch(er){
     console.log("error is: ", er)
